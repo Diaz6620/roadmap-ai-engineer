@@ -1,4 +1,4 @@
-from tasks import create_task, get_tasks,get_task_by_id, tasks
+from tasks import create_task, get_tasks,get_task_by_id, update_task, tasks
 
 
 
@@ -7,7 +7,18 @@ def show_menu():
     print("1. Crear tarea")
     print("2. Ver tareas")
     print("3. Buscar tarea")
-    print("4. Salir")
+    print("4. Modificar tarea")
+    print("5. Salir")
+
+
+
+def show_update_menu():
+    print("\n--- MODIFICAR TAREA ---")
+    print("1. Título")
+    print("2. Descripción")
+    print("3. Completar / Pendiente")
+    print("4. Aplicar cambios")
+    print("5. Salir")
 
 
 
@@ -50,6 +61,59 @@ def search_task_menu():
 
 
 
+def find_task(task_id):
+    for task in tasks:
+        if task['id'] == task_id:
+            return task
+        
+    return None
+
+
+
+def update_menu():
+    
+
+    task_id = int(input("Introduce el ID: "))
+
+    task_found = find_task(task_id)
+        
+    if task_found:
+        changes = {}
+
+        while True:
+            show_update_menu()
+            update_option = input("Selecciona una opción (1-5)")
+
+            if update_option == "1":
+                updated_title = input("Introduce en nuevo título: ")
+                if updated_title:
+                    changes['title'] = updated_title
+
+            elif update_option == "2":
+                updated_content = input("Introduce nueva descripción: ")
+                if updated_content:
+                    changes['content'] = updated_content
+
+            elif update_option == "3":
+                changes = {'completed': not task_found['completed']}
+
+            elif update_option == "4":
+                if not changes:
+                    print("No existen cambios a aplicar")
+                else:
+                   task_updated = update_task(task_found, changes)
+                   return show_task(task_updated)
+                
+            elif update_option == "5":
+                break
+
+            else:
+                print("Opción inválida.")
+                
+
+
+
+
 
 def main():
     while True:
@@ -72,6 +136,9 @@ def main():
         
         elif user_option == "3":
             search_task_menu()
+
+        elif user_option == "4":
+            update_menu()
 
         else:
             print("Opción inválida")

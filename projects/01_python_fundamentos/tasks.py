@@ -40,3 +40,8 @@ def get_task_by_id(task_id):
     
     return None
     
+
+
+def update_task(task_to_update, changes):
+    task_to_update.update(changes)
+    return task_to_update
