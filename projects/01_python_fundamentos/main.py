@@ -1,4 +1,4 @@
-from tasks import create_task, get_tasks,get_task_by_id, update_task, tasks
+from tasks import create_task, get_tasks,get_task_by_id, update_task, delete_task, tasks
 
 
 
@@ -13,12 +13,84 @@ def show_menu():
 
 
 def show_update_menu():
-    print("\n--- MODIFICAR TAREA ---")
-    print("1. Título")
-    print("2. Descripción")
-    print("3. Completar / Pendiente")
-    print("4. Aplicar cambios")
-    print("5. Salir")
+    task_id = int(input("Introduce un ID: "))
+
+    task_found = get_task_by_id(task_id)
+
+    if not task_found:
+        print(f"No existe ninguna tarea con el ID {task_id}")
+        return
+
+    changes = {}
+
+    while True: 
+        print("\n--- MODIFICAR TAREA ---")
+        print("1. Título")
+        print("2. Descripción")
+        print("3. Completar / Pendiente")
+        print("4. Aplicar cambios")
+        print("5. Salir")
+
+        update_option = input("Selecciona una opción (1-5)")
+
+        if update_option == "1":
+            updated_title = input("Introduce en nuevo título: ")
+            if updated_title:
+                changes['title'] = updated_title
+
+        elif update_option == "2":
+            updated_content = input("Introduce nueva descripción: ")
+            if updated_content:
+                changes['content'] = updated_content
+
+        elif update_option == "3":
+            changes = changes['completed'] = not task_found['completed']
+        elif update_option == "4":
+            if not changes:
+                print("No existen cambios a aplicar")
+            else:
+                task_updated = update_task(task_id, changes)
+                print("Tarea actualizada:")
+                show_task(task_updated)
+                return
+
+        elif update_option == "5":
+            break
+
+        else:
+            print("Opción inválida.")
+
+
+
+def delete_task_menu():
+    task_id = int(input("Introduce el ID: "))
+
+    task_to_delete = get_task_by_id(task_id)
+
+    if not task_to_delete:
+        print(f"No existe ninguna tarea con el ID {task_id}")
+        return
+    
+    show_task(task_to_delete)
+
+    print("¿Esta seguro que desea eliminar la tarea?")
+
+    while True:
+        user_option = input("s/n: ").lower()
+
+        if user_option == "n":
+            print("Cancelado.")
+            break
+        elif user_option == "s":
+            task_deleted = delete_task(task_to_delete)
+            print("Tarea eliminada correctamente:")
+            show_task(task_deleted)
+
+            break
+        else:
+            print("Opción inválida...")
+    
+    
 
 
 
@@ -61,60 +133,6 @@ def search_task_menu():
 
 
 
-def find_task(task_id):
-    for task in tasks:
-        if task['id'] == task_id:
-            return task
-        
-    return None
-
-
-
-def update_menu():
-    
-
-    task_id = int(input("Introduce el ID: "))
-
-    task_found = find_task(task_id)
-        
-    if task_found:
-        changes = {}
-
-        while True:
-            show_update_menu()
-            update_option = input("Selecciona una opción (1-5)")
-
-            if update_option == "1":
-                updated_title = input("Introduce en nuevo título: ")
-                if updated_title:
-                    changes['title'] = updated_title
-
-            elif update_option == "2":
-                updated_content = input("Introduce nueva descripción: ")
-                if updated_content:
-                    changes['content'] = updated_content
-
-            elif update_option == "3":
-                changes = {'completed': not task_found['completed']}
-
-            elif update_option == "4":
-                if not changes:
-                    print("No existen cambios a aplicar")
-                else:
-                   task_updated = update_task(task_found, changes)
-                   return show_task(task_updated)
-                
-            elif update_option == "5":
-                break
-
-            else:
-                print("Opción inválida.")
-                
-
-
-
-
-
 def main():
     while True:
         show_menu()
@@ -138,7 +156,10 @@ def main():
             search_task_menu()
 
         elif user_option == "4":
-            update_menu()
+            show_update_menu()
+
+        elif user_option == "5":
+            delete_task_menu()
 
         else:
             print("Opción inválida")

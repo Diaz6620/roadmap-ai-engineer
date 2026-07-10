@@ -42,6 +42,22 @@ def get_task_by_id(task_id):
     
 
 
-def update_task(task_to_update, changes):
-    task_to_update.update(changes)
-    return task_to_update
+def update_task(task_id, changes):
+    task = get_task_by_id(task_id)
+
+    if not task:
+        return None
+    
+    task.update(changes)
+    return task
+    
+            
+def delete_task(task):
+    if not task:
+        return None
+    
+    tasks.remove(task)
+    return task
+
+
+    
