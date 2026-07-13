@@ -14,7 +14,7 @@ def show_menu():
 
 
 def show_update_menu():
-    task_id = int(input("Introduce un ID: "))
+    task_id = get_id()
 
     task_found = get_task_by_id(task_id)
 
@@ -79,7 +79,7 @@ def show_update_menu():
 
 
 def delete_task_menu():
-    task_id = int(input("Introduce el ID: "))
+    task_id = get_id()
 
     task_to_delete = get_task_by_id(task_id)
 
@@ -138,7 +138,7 @@ def list_tasks_menu():
 
 def search_task_menu():
     print("\n--- BUSCADOR DE TAREAS ---")
-    input_id = int(input("Introduce el ID: "))
+    input_id = get_id()
 
     task_by_id = get_task_by_id(input_id)
 
@@ -158,6 +158,19 @@ def show_create_menu():
 
     print("Tarea creada correctamente")
     print(f"ID: {new_task['id']}\nTÍTULO: {new_task['title']}")
+
+
+
+def get_id():
+    while True:
+        try:
+            task_id = int(input("Introduce un ID: "))
+            return task_id
+        except ValueError:
+            print("El valor introducido no es válido.")
+
+        
+
 
 
 
