@@ -1,4 +1,4 @@
-from tasks import create_task, get_tasks,get_task_by_id, update_task, delete_task, tasks
+from tasks import create_task, get_tasks,get_task_by_id, update_task, delete_task
 
 
 
@@ -8,7 +8,8 @@ def show_menu():
     print("2. Ver tareas")
     print("3. Buscar tarea")
     print("4. Modificar tarea")
-    print("5. Salir")
+    print("5. Eliminar tarea")
+    print("6. Salir")
 
 
 
@@ -20,6 +21,8 @@ def show_update_menu():
     if not task_found:
         print(f"No existe ninguna tarea con el ID {task_id}")
         return
+    
+    show_task(task_found)
 
     changes = {}
 
@@ -44,7 +47,8 @@ def show_update_menu():
                 changes['content'] = updated_content
 
         elif update_option == "3":
-            changes = changes['completed'] = not task_found['completed']
+            current_value = changes.get('completed', task_found['completed'])
+            changes['completed'] = not current_value
         elif update_option == "4":
             if not changes:
                 print("No existen cambios a aplicar")
@@ -52,13 +56,25 @@ def show_update_menu():
                 task_updated = update_task(task_id, changes)
                 print("Tarea actualizada:")
                 show_task(task_updated)
-                return
+                break
 
         elif update_option == "5":
-            break
+            if changes:
+                print("¿Desea salir sin aplicar los cambios pendientes?")
+                
+                while True:
+                    user_option = input("s/n: ").lower()
+               
+                    if user_option == "n":
+                        print("Voviendo al editor...")
+                        break
+                    elif user_option == "s":
+                        return
+                    else:
+                        print("Opción inválida...")
 
-        else:
-            print("Opción inválida.")
+            else:
+                return
 
 
 
@@ -101,6 +117,7 @@ def show_task(task):
     print(f"DESCRIPCIÓN: {task['content']}") 
     if task['completed']:
         print("[X] Completada")
+        print("---------------------------------")
     else:
         print("[ ] Pendiente")
         print("---------------------------------")
@@ -132,22 +149,26 @@ def search_task_menu():
     show_task(task_by_id)
 
 
+def show_create_menu():
+    print("\n--- CREAR TAREA ---")
+    new_title = input("Introduce título: ")
+    new_content = input("Introduce el contenido de la tarea: ")
+
+    new_task = create_task(new_title, new_content)
+
+    print("Tarea creada correctamente")
+    print(f"ID: {new_task['id']}\nTÍTULO: {new_task['title']}")
+
+
 
 def main():
     while True:
         show_menu()
 
-        user_option = input("Selecciona una opción (1-4): ")
+        user_option = input("Selecciona una opción (1-6): ")
 
         if user_option == "1":
-            print("\n--- CREAR TAREA ---")
-            new_title = input("Introduce título: ")
-            new_content = input("Introduce el contenido de la tarea: ")
-
-            new_task = create_task(new_title, new_content)
-
-            print("Tarea creada correctamente")
-            print(f"ID: {new_task['id']}\nTÍTULO: {new_task['title']}")
+            show_create_menu()
 
         elif user_option == "2":
             list_tasks_menu()
@@ -160,6 +181,9 @@ def main():
 
         elif user_option == "5":
             delete_task_menu()
+
+        elif user_option == "6":
+            break
 
         else:
             print("Opción inválida")
