@@ -25,15 +25,15 @@ def create_task(user_title, user_content):
 
 
 
-
 def get_tasks():
     return tasks.copy()
 
     
 
 
+
 def update_task(task_id, changes):
-    task = search_a_task(task_id)
+    task = get_task_by_id(task_id)
 
     if not task:
         return None
@@ -41,6 +41,9 @@ def update_task(task_id, changes):
     task.update(changes)
     return task
     
+
+
+
             
 def delete_task(task):
     if not task:
@@ -48,6 +51,10 @@ def delete_task(task):
     
     tasks.remove(task)
     return task
+
+
+
+
 
 
 def get_task_by_id(task_id):
