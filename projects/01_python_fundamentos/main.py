@@ -1,4 +1,7 @@
-from tasks import create_task, get_tasks,get_task_by_id, update_task, delete_task
+from tasks import create_task, get_tasks,get_task_by_id, update_task, delete_task, initialize_tasks, get_state
+from storage import load_tasks, save_tasks
+
+
 
 
 
@@ -20,7 +23,7 @@ def show_update_menu():
 
     if not task_found:
         print(f"No existe ninguna tarea con el ID {task_id}")
-        return
+        return False
     
     show_task(task_found)
 
@@ -49,6 +52,7 @@ def show_update_menu():
         elif update_option == "3":
             current_value = changes.get('completed', task_found['completed'])
             changes['completed'] = not current_value
+
         elif update_option == "4":
             if not changes:
                 print("No existen cambios a aplicar")
@@ -56,7 +60,10 @@ def show_update_menu():
                 task_updated = update_task(task_id, changes)
                 print("Tarea actualizada:")
                 show_task(task_updated)
-                break
+
+                if task_updated:
+                    return True
+                
 
         elif update_option == "5":
             if changes:
@@ -69,12 +76,12 @@ def show_update_menu():
                         print("Voviendo al editor...")
                         break
                     elif user_option == "s":
-                        return
+                        return False
                     else:
                         print("Opción inválida...")
 
             else:
-                return
+                return False
 
 
 
@@ -85,7 +92,7 @@ def delete_task_menu():
 
     if not task_to_delete:
         print(f"No existe ninguna tarea con el ID {task_id}")
-        return
+        return False
     
     show_task(task_to_delete)
 
@@ -96,15 +103,22 @@ def delete_task_menu():
 
         if user_option == "n":
             print("Cancelado.")
-            break
+            return False
+        
         elif user_option == "s":
             task_deleted = delete_task(task_to_delete)
             print("Tarea eliminada correctamente:")
             show_task(task_deleted)
 
-            break
+            if task_deleted:
+                return True
+            
+            return False
+            
         else:
             print("Opción inválida...")
+
+    
     
     
 
@@ -156,8 +170,12 @@ def show_create_menu():
 
     new_task = create_task(new_title, new_content)
 
-    print("Tarea creada correctamente")
-    print(f"ID: {new_task['id']}\nTÍTULO: {new_task['title']}")
+    if new_task:
+        print("Tarea creada correctamente")
+        print(f"ID: {new_task['id']}\nTÍTULO: {new_task['title']}")
+        return True
+    
+    return False
 
 
 
@@ -169,19 +187,32 @@ def get_id():
         except ValueError:
             print("El valor introducido no es válido.")
 
+
+
+def save_state_if_changed(changed, state):
+    if changed:
+        save_tasks(state)
+
+
         
 
 
 
 
 def main():
+    data = load_tasks()
+    initialize_tasks(data)
+
     while True:
         show_menu()
-
+        
         user_option = input("Selecciona una opción (1-6): ")
 
         if user_option == "1":
-            show_create_menu()
+            changed = show_create_menu()
+            if changed:
+                state = get_state()
+                save_state_if_changed(changed, state)
 
         elif user_option == "2":
             list_tasks_menu()
@@ -190,10 +221,16 @@ def main():
             search_task_menu()
 
         elif user_option == "4":
-            show_update_menu()
+            changed = show_update_menu()
+            if changed:
+                state = get_state()
+                save_state_if_changed(changed, state)
 
         elif user_option == "5":
-            delete_task_menu()
+            changed = delete_task_menu()
+            if changed:
+                state = get_state()
+                save_state_if_changed(changed, state)
 
         elif user_option == "6":
             break

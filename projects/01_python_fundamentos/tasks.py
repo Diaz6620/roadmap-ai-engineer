@@ -1,7 +1,26 @@
 from datetime import datetime
+from copy import deepcopy
 
 tasks = []
 next_id = 1
+
+
+
+def initialize_tasks(data):
+    global tasks
+    global next_id
+
+    tasks = data["tasks"]
+    next_id = data["next_id"]
+
+
+
+
+def get_state():
+    return {
+        "next_id": next_id,
+        "tasks": deepcopy(tasks)
+    }
 
 
 
@@ -13,7 +32,7 @@ def create_task(user_title, user_content):
         "title": user_title,
         "content": user_content,
         "completed": False,
-        "created_at": datetime.now()
+        "created_at": datetime.now().isoformat()
     }
 
     tasks.append(task)
