@@ -1,5 +1,13 @@
-from tasks import create_task, get_tasks,get_task_by_id, update_task, delete_task, initialize_tasks, get_state
-from storage import load_tasks, save_tasks
+from tasks import create_task, get_tasks, get_task_by_id, update_task, delete_task, initialize_tasks, get_state
+from storage import load_tasks, save_tasks, initialize_storage
+from exceptions import DataLoadError, DataSaveError, StorageEmptyError
+
+
+
+def screen_clear():
+    print("\033[H\033[J", end="")
+
+
 
 
 
@@ -17,6 +25,8 @@ def show_menu():
 
 
 def show_update_menu():
+    screen_clear()
+
     task_id = get_id()
 
     task_found = get_task_by_id(task_id)
@@ -86,6 +96,8 @@ def show_update_menu():
 
 
 def delete_task_menu():
+    screen_clear()
+
     task_id = get_id()
 
     task_to_delete = get_task_by_id(task_id)
@@ -138,6 +150,8 @@ def show_task(task):
 
 
 def list_tasks_menu():
+    screen_clear()
+
     print("\n--- LISTA DE TAREAS ---")
 
     tasks_list = get_tasks()
@@ -151,6 +165,8 @@ def list_tasks_menu():
 
 
 def search_task_menu():
+    screen_clear()
+
     print("\n--- BUSCADOR DE TAREAS ---")
     input_id = get_id()
 
@@ -164,6 +180,8 @@ def search_task_menu():
 
 
 def show_create_menu():
+    screen_clear()
+
     print("\n--- CREAR TAREA ---")
     new_title = input("Introduce título: ")
     new_content = input("Introduce el contenido de la tarea: ")
@@ -195,13 +213,36 @@ def save_state_if_changed(changed, state):
 
 
         
-
+###################################################################################################################
 
 
 
 def main():
-    data = load_tasks()
-    initialize_tasks(data)
+    try:
+        data = load_tasks()
+        initialize_tasks(data)
+
+    except StorageEmptyError as error:
+        print("El archivo de tareas está vacío.")
+
+        while True:
+            option = input("¿Desea reiniciar el archivo de almacenamiento? (s/n):").lower()
+
+            if option == "s":
+                data = initialize_storage()
+                initialize_tasks(data)
+                break
+
+            elif option == "n":
+                print("No es posible inicializar al aplicación.")
+                return
+            
+            else:
+                print("Opción inválida.")
+    
+    except DataLoadError as error:
+        print("No se pudieron cargar las tareas. La aplicación no puede iniciarse")
+        return
 
     while True:
         show_menu()
